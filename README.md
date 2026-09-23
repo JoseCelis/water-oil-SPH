@@ -9,7 +9,6 @@ pressure, viscosity and surface tension. See [kernel.h](kernel.h) and [sph.cpp](
 - `g++` with OpenMP support
 - `make`
 - Python 3 and `ffmpeg` (for the PyVista animations)
-- `gnuplot` (optional, only for the old PNG preview, `plt.gnu`)
 
 ## Build and run
 
@@ -120,31 +119,12 @@ python3 -m venv .venv
 .venv/bin/pip install pyvista imageio imageio-ffmpeg
 ```
 
-### Old gnuplot preview
-
-`bash plt.gnu` renders every `*.dat` in the current directory to a PNG and moves them
-to `vid/`. It is no longer part of the Makefile, and gnuplot does not depth-sort
-points, so occlusion is wrong when the view is rotated.
-
-### Join the videos and speed them up 4x
-
-```bash
-ffmpeg -i part1.mp4 -i part2.mp4 -i part3.mp4 \
-  -filter_complex "[0:v][1:v][2:v]concat=n=3:v=1:a=0,setpts=PTS/4[v]" \
-  -map "[v]" -r 24 -c:v libx264 -crf 18 -pix_fmt yuv420p out_4x.mp4
-```
-
-The three inputs must have the same resolution (same `--window-size`).
-
 ## Folder layout
 
 | Path | Contents |
 |---|---|
 | [sph.cpp](sph.cpp), [kernel.h](kernel.h) | the solver and the SPH kernels |
-| [Makefile](Makefile), [plt.gnu](plt.gnu) | build, run and render (`plt.gnu` is the old gnuplot preview) |
+| [Makefile](Makefile) | build |
 | [render_pyvista.py](render_pyvista.py), `.venv/` | PyVista animation script and its environment |
 | `000.data` | initial particle state (11000 rows) |
-| `part_1/`, `part_2/`, `part_3/` | saved `.dat` frames from finished runs |
-| `two-phases/`, `Alejandro/`, `gas/`, `boundaries/` | earlier variants and saved snapshots |
-| `blog/` | write-up of the water-over-oil density inversion |
-| `*.pdf` | reference papers |
+
