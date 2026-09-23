@@ -5,7 +5,7 @@ LDFLAGS  = -lm
 TARGET = sph
 SRC    = sph.cpp
 
-.PHONY: all run animate clean
+.PHONY: all run fresh animate clean
 # prerequisites of `all` must run in order: simulate, then plot
 .NOTPARALLEL:
 
@@ -27,12 +27,17 @@ fresh: $(TARGET)
 	rm -f *.dat
 	./$(TARGET)
 
-# This needs to be a RECIPE (tab-indented, below the colon). Written as
-# `animate: bash plt.gnu` it was a target declaration instead: it made `animate`
-# depend on files named `bash` and `plt.gnu`, so make failed with
-# "No rule to make target 'bash'" and the plotting never ran at all.
+# Render the frames in DIR to an mp4 with PyVista (real z-buffer, so occlusion is
+# correct when the camera is rotated). Override on the command line, e.g.
+#   make animate DIR=part_1 OUT=part1.mp4
+#   make animate ARGS="--opacity 0.5 --rotate"
+DIR    = .
+OUT    = animation.mp4
+ARGS   =
+PYTHON = .venv/bin/python
+
 animate:
-	bash plt.gnu
+	$(PYTHON) render_pyvista.py $(DIR) --out $(OUT) $(ARGS)
 
 clean:
-	rm -f $(TARGET) *.dat *.png
+	rm -f $(TARGET) *.dat

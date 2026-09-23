@@ -95,14 +95,6 @@ def main():
         # on-top artifact this script exists to avoid. Depth peeling fixes
         # that at the cost of extra render passes.
         pl.enable_depth_peeling(number_of_peels=8)
-    # pl.show_bounds(
-    #     bounds=(-DIM, DIM, -DIM, DIM, 0, ZTOP),
-    #     location="outer",
-    #     color="black",
-    #     xtitle="x",
-    #     ytitle="y",
-    #     ztitle="z",
-    # )
 
     pl.camera_position = "iso"
     pl.camera.azimuth = args.azimuth
@@ -115,10 +107,8 @@ def main():
     for i, f in enumerate(files):
         pos, speed, phase = load_frame(f)
         cloud.points = pos
-        # cloud["scalar"] = speed if args.color == "speed" else phase
         if args.rotate:
             pl.camera.azimuth = args.azimuth + step * i
-        # pl.add_text(os.path.basename(f), name="frame_label", color="black", font_size=10)
         pl.write_frame()
         if (i + 1) % 100 == 0 or i == n - 1:
             print(f"  {i + 1}/{n} frames", file=sys.stderr)

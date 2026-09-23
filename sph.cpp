@@ -207,7 +207,7 @@ public:
 void Particle::setparams(int phases){
   if( phases == 1){
     phase = 1;
-    h =  pow(315*VolT*kernel_vol_const/(64*M_PI*N),0.3333);
+    h =  pow(315*VolT*kernel_vol_const/(64*M_PI*N), 0.3333);
     rhozero = rhowater;
     mass = rhozero * VolT/N;
     mu = muwater;
@@ -326,33 +326,6 @@ void initial_cond(string fig, Particle *body, int phases){
     }
   }
   
-  //not working
-  if(fig == "sphere"){//the radial distribution should be r^3 I will use rejection
-    for(int i=0; i<N; i++ ){
-      body[i].setdensity(0.0);
-      body[i].setparams(phases);
-      body[i].reinit();
-      double rad, theta, phi;
-      double random1,random2, max_prob, max_rad;
-      max_rad = pow(3.0*(Volwater+Voloil)/(4.0*M_PI),0.33333);
-      max_prob = rhowater*4.0*M_PI*pow(max_rad,3)/3.0;
-      while(true){//rejection algorithm
-        random1 = max_rad*( (double)rand()/(RAND_MAX) );
-        random2 = max_prob*( (double)rand()/(RAND_MAX) );
-        if( random2 < rhowater*4.0*M_PI*pow(random1,3)/3.0 ){
-          rad = random1;
-          break;
-	      }
-      }
-      theta = ( (double)rand()/(RAND_MAX) )*M_PI;
-      phi = ( (double)rand()/(RAND_MAX) )*2.0*M_PI;
-      body[i].r[0] = rad*sin(theta)*cos(phi); //
-      body[i].r[1] = rad*sin(theta)*sin(phi); //
-      body[i].r[2] = rad*cos(theta); //
-      memset( body[i].v, 0.0, sizeof(body[i].v) );  
-    }
-  }
-
   if(fig == "layered"){
     //oil starts at the bottom, water on top: the opposite of the buoyant
     //equilibrium, so the swap is visible as the simulation runs.
@@ -378,12 +351,6 @@ void initial_cond(string fig, Particle *body, int phases){
   }
 
   if(fig == "file"){
-    ifstream file;
-    file.open("000.data");
-    if(!file.is_open()){
-      cerr<<"initial_cond: could not open 000.data"<<endl;
-      exit(1);
-    }
     //Parse line by line with the commas turned into whitespace. Reading the
     //separator with `file>>comma` into a string only works when the commas are
     //themselves surrounded by spaces: against "x,y,z" the string extraction
@@ -391,6 +358,12 @@ void initial_cond(string fig, Particle *body, int phases){
     //each particle ends up holding one field from seven consecutive lines and
     //phase_int parses "-0" as 0 -> setphase(0) -> every particle becomes oil.
     //Going through a stringstream makes the reader independent of the spacing.
+    ifstream file;
+    file.open("000.data");
+    if(!file.is_open()){
+      cerr<<"initial_cond: could not open 000.data"<<endl;
+      exit(1);
+    }
     int Nfile = N1+N2;//particles stored in the equilibrium file
     string line;
     int nread = 0;
